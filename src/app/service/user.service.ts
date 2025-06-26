@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CustomHttpResponse, Profile } from '../interface/appstates';
 import { catchError, Observable, tap, throwError } from 'rxjs';
@@ -29,6 +29,15 @@ export class UserService {
         )
         .pipe(tap(console.log), catchError(this.handleError))
     );
+
+    profile$ = () =>
+      <Observable<CustomHttpResponse<Profile>>>(
+        this.http
+          .get<CustomHttpResponse<Profile>>(
+            `${this.server}/user/profile`, { headers : new HttpHeaders().set('Authorization', 'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNRUhJTl9BUFBMSUNBVElPTiIsImF1ZCI6IkNVU1RPTUVSX01BTkFHRU1FTlRfU0VSVklDRSIsImlhdCI6MTc1MDk2OTQxMywic3ViIjoiZ2VvbWVoaW5AZ21haWwuY29tIiwiYXV0aG9yaXRpZXMiOlsiUkVBRDpVU0VSIiwiIFJFQUQ6Q1VTVE9NRVIiXSwiZXhwIjoxNzUwOTcxMjEzfQ.ewsqU_6lE0aqnAGf7qDPJViQfQtWaoFjvCxgBV20T3pt6jhmgCiwMQNtrQonOzFlDdB0wQMrauY2jW9MvGzpUg')}
+          )
+          .pipe(tap(console.log), catchError(this.handleError))
+      );
 
   handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage: string;
