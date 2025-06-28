@@ -48,26 +48,26 @@
             <div class="tab-content p-4 p-md-5" id="v-pills-tabContent" style="border-left: 1px solid #d4d0d0;">
               <div class="tab-pane fade show active" id="profile-tab" role="tabpanel">
                 <h3 class="mb-4">Profile Settings</h3>
-                <form>
-                  <input type="hidden" name="id" />
+                <form #profileForm="ngForm" (ngSubmit)="updateProfile(profileForm)">
+                  <input type="hidden" name="id"  [ngModel]="state?.appData?.data?.user?.id" />
                   <div class="row">
                     <div class="col-md-6"><label>First Name</label><input type="text" name="firstName" 
-                        [ngModel]="state?.appData?.data?.user?.firstName" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'"class="form-control" value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.firstName" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async)"class="form-control" value=""/></div>
                     <div class="col-md-6"><label>Last Name</label><input type="text" name="lastName" 
-                        [ngModel]="state?.appData?.data?.user?.lastName" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" class="form-control" value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.lastName" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " class="form-control" value=""/></div>
                     <div class="col-md-6"><label>Email</label><input type="email" name="email" 
-                        [ngModel]="state?.appData?.data?.user?.email" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" class="form-control" value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.email" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " class="form-control" value=""/></div>
                     <div class="col-md-6"><label>Phone</label><input type="text" name="phone" 
-                        [ngModel]="state?.appData?.data?.user?.phone" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" class="form-control" value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.phone" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " class="form-control" value=""/></div>
                     <div class="col-md-6"><label>Address</label><input type="text" name="address" 
-                        [ngModel]="state?.appData?.data?.user?.address" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" class="form-control"  value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.address" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " class="form-control"  value=""/></div>
                     <div class="col-md-6"><label>Job Title</label><input type="text" name="title" 
-                        [ngModel]="state?.appData?.data?.user?.title" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" class="form-control" value=""/></div>
+                        [ngModel]="state?.appData?.data?.user?.title" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " class="form-control" value=""/></div>
                     <div class="col-md-12"><label>Bio</label><textarea class="form-control" name="bio" 
-                        [ngModel]="state?.appData?.data?.user?.bio" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER'" rows="4" ></textarea></div>
+                        [ngModel]="state?.appData?.data?.user?.bio" [disabled]="state?.appData?.data?.user?.roleName === 'ROLE_USER' || (isLoading$ | async) " rows="4" ></textarea></div>
                   </div>
                   <div>
-                    <button type="submit" class="btn btn-primary mt-4" [disabled]="state?.appData?.data">
+                    <button type="submit" class="btn btn-primary mt-4" [disabled]="state?.appData?.data.user?.roleName === 'ROLE_USER'">
                         <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
                         <span *ngIf="isLoading$ | async">Loading...</span>
                         <span *ngIf="!(isLoading$ | async)">Update</span>
@@ -158,8 +158,8 @@
                     <tbody>
                       <tr>
                         <td>Chrome</td>
-                        <td>192.168.1.209</td>
-                        <td>01-15-2023 5:25:20</td>
+                        <td>Example IP</td>
+                        <td>06-25-2025</td>
                         <td><span class="badge bg-success">LOGIN_ATTEMPT_SUCCESS</span></td>
                         <td>You logged in successfully</td>
                         <td><button class="btn btn-sm" style="background-color: #fd5d0d;">Report</button></td>
