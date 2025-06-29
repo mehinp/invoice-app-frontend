@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { CustomHttpResponse, Profile } from '../interface/appstates';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { User } from '../interface/user';
+import { Key } from '../enum/key.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ import { User } from '../interface/user';
 export class UserService {
   private readonly server: string = 'http://localhost:8080';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login$ = (email: string, password: string) =>
     <Observable<CustomHttpResponse<Profile>>>this.http
@@ -48,6 +49,23 @@ export class UserService {
           user,
         )
         .pipe(tap(console.log), catchError(this.handleError))
+    );
+
+  refreshToken$ = () =>
+    <Observable<CustomHttpResponse<Profile>>>(
+      this.http
+        .get<CustomHttpResponse<Profile>>(
+          `${this.server}/user/refresh/token`, { headers: { Authorization: `Bearer ${localStorage.getItem(Key.REFRESH_TOKEN)}` } }
+        )
+        .pipe(
+          tap(response => {
+            console.log(response);
+            localStorage.removeItem(Key.TOKEN);
+            localStorage.removeItem(Key.REFRESH_TOKEN);
+            localStorage.setItem(Key.TOKEN, response.data.access_token)
+            localStorage.setItem(Key.REFRESH_TOKEN, response.data.refresh_token)
+          }), 
+          catchError(this.handleError))
     );
 
   handleError(error: HttpErrorResponse): Observable<never> {

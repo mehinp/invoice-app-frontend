@@ -79,14 +79,25 @@
                 <h3 class="mb-4">Password Settings</h3>
                 <form>
                   <div class="row">
-                    <div class="col-md-6"><label>Current Password</label><input type="password" class="form-control" /></div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Current Password</label><input type="password" class="form-control"/>
+                     </div>
+                    </div>
                   </div>
                   <div class="row">
-                    <div class="col-md-6"><label>New Password</label><input type="password" class="form-control" /></div>
-                    <div class="col-md-6"><label>Confirm New Password</label><input type="password" class="form-control" /></div>
+                    <div class="form-group">
+                      <div class="col-md-6"><label>New Password</label><input type="password" class="form-control" minlength="5"/></div>
+                      <div class="col-md-6 mt-2 "><label>Confirm New Password</label><input type="password" class="form-control" minlength="5" /></div>
+                    </div>
                   </div>
-                  <button type="submit" class="btn btn-primary">Update</button>
-                </form>
+                  <button type="submit" class="btn btn-primary mt-3" [disabled]="state?.appData?.data.user?.roleName === 'ROLE_USER'">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
+                    <span *ngIf="isLoading$ | async">Loading...</span>
+                    <span *ngIf="!(isLoading$ | async)">Update</span>
+                </button>
+              
+              </form>
               </div>
   
               <div class="tab-pane fade" id="security-tab" role="tabpanel">
