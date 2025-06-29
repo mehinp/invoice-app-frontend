@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable, of, BehaviorSubject, map, startWith, catchError } from 'rxjs';
+import { Observable, of, BehaviorSubject, map, startWith, catchError, delay } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
 import { Key } from 'src/app/enum/key.enum';
 import { CustomHttpResponse, Profile } from 'src/app/interface/appstates';
@@ -20,7 +20,7 @@ export class ProfileComponent implements OnInit {
   isLoading$ = this.isLoadingSubject.asObservable();
   public readonly DataState = DataState;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   ngOnInit(): void {
     this.profileState$ = this.userService.profile$()
@@ -32,7 +32,7 @@ export class ProfileComponent implements OnInit {
             dataState: DataState.LOADED, appData: response
           };
         }),
-        startWith({ dataState: DataState.LOADING}),
+        startWith({ dataState: DataState.LOADING }),
         catchError((error: string) => {
           return of({
             dataState: DataState.ERROR,
@@ -41,7 +41,7 @@ export class ProfileComponent implements OnInit {
           });
         })
       )
-  } 
+  }
 
   updateProfile(profileForm: NgForm): void {
     this.isLoadingSubject.next(true);
@@ -49,13 +49,13 @@ export class ProfileComponent implements OnInit {
       .pipe(
         map(response => {
           console.log(response)
-          this.dataSubject.next({...response, data: response.data});
+          this.dataSubject.next({ ...response, data: response.data });
           this.isLoadingSubject.next(false);
           return {
             dataState: DataState.LOADED, appData: this.dataSubject.value
           };
         }),
-        startWith({  dataState: DataState.LOADED, appData: this.dataSubject.value}),
+        startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
           this.isLoadingSubject.next(false);
           return of({
@@ -65,7 +65,62 @@ export class ProfileComponent implements OnInit {
           });
         })
       )
-  } 
+  }
+
+
+  updatePassword(passwordForm: NgForm): void {
+    this.isLoadingSubject.next(true);
+    if (passwordForm.value.newPassword === passwordForm.value.confirmNewPassword) {
+      this.profileState$ = this.userService.updatePassword$(passwordForm.value)
+        .pipe(
+          map(response => {
+            console.log(response)
+            this.isLoadingSubject.next(false);
+            passwordForm.reset();
+            return {
+              dataState: DataState.LOADED, appData: this.dataSubject.value
+            };
+          }),
+          startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
+          catchError((error: string) => {
+            this.isLoadingSubject.next(false);
+            return of({
+              dataState: DataState.LOADED,
+              appData: this.dataSubject.value,
+              error,
+            });
+          })
+        )
+    } else {
+      passwordForm.reset();
+      console.log("Passwords don't match.")
+      this.isLoadingSubject.next(false);
+    }
+  }
+
+  updateRole(roleForm: NgForm): void {
+    this.isLoadingSubject.next(true);
+    this.profileState$ = this.userService.updateRole$(roleForm.value.roleName)
+      .pipe(
+        map(response => {
+          console.log(response)
+          this.dataSubject.next({ ...response, data: response.data });
+          this.isLoadingSubject.next(false);
+          return {
+            dataState: DataState.LOADED, appData: this.dataSubject.value
+          };
+        }),
+        startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
+        catchError((error: string) => {
+          this.isLoadingSubject.next(false);
+          return of({
+            dataState: DataState.LOADED,
+            appData: this.dataSubject.value,
+            error,
+          });
+        })
+      )
+  }
 
 
 }

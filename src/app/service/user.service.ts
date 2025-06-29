@@ -64,17 +64,39 @@ export class UserService {
             localStorage.removeItem(Key.REFRESH_TOKEN);
             localStorage.setItem(Key.TOKEN, response.data.access_token)
             localStorage.setItem(Key.REFRESH_TOKEN, response.data.refresh_token)
-          }), 
+          }),
           catchError(this.handleError))
     );
 
-  handleError(error: HttpErrorResponse): Observable<never> {
+  updatePassword$ = (form: { currentPassword: string, newPassword: string, confirmNewPassword: string}) =>
+    <Observable<CustomHttpResponse<Profile>>>(
+      this.http
+        .patch<CustomHttpResponse<Profile>>(
+          `${this.server}/user/update/password`,
+          form
+        )
+        .pipe(tap(console.log), catchError(this.handleError))
+    );
+
+    updateRole$ = (roleName: string) =>
+      <Observable<CustomHttpResponse<Profile>>>(
+        this.http
+          .patch<CustomHttpResponse<Profile>>(
+            `${this.server}/user/update/role/${roleName}`,
+            {}
+          )
+          .pipe(tap(console.log), catchError(this.handleError))
+      );
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.log(error);
     let errorMessage: string;
     if (error.error instanceof ErrorEvent) {
       errorMessage = `A client error occurred - ${error.error.message}`;
     } else {
       if (error.error.reason) {
         errorMessage = error.error.reason;
+        console.log(errorMessage);
       } else {
         errorMessage = `An error occurred - Error status ${error.status}`;
       }
@@ -82,3 +104,5 @@ export class UserService {
     return throwError(() => errorMessage);
   }
 }
+
+
