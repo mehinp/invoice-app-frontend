@@ -17,9 +17,9 @@
               <div style="text-align: center" class="p-4">
                 <div class="img-circle text-center mb-3">
                   <span style="position: relative">
-                    <!-- <img [src]="state?.appData?.data?.user?.imageUrl" alt={{state?.appData?.data?.user?.firstName}} class="shadow" /> -->
-                    <img src="https://img.freepik.com/free-icon/user_318-159711.jpg" alt={{state?.appData?.data?.user?.firstName}} class="shadow" />
-                    <i class="bi bi-camera-fill right-position"></i>
+                    <img [src]="state?.appData?.data?.user?.imageUrl" alt={{state?.appData?.data?.user?.firstName}} class="shadow" />
+                    <!-- <img src="https://img.freepik.com/free-icon/user_318-159711.jpg" alt={{state?.appData?.data?.user?.firstName}} class="shadow" /> -->
+                    <i (click)="fileInput.click()"class="bi bi-camera-fill right-position"></i>
                   </span>
                 </div>
                 <h4 class="text-center">{{ state?.appData?.data?.user?.firstName}} {{state?.appData?.data?.user?.lastName}}</h4>
@@ -127,11 +127,27 @@
               </div>
   
               <div class="tab-pane fade" id="application-tab" role="tabpanel">
-                <h3 class="mb-4">Application Settings</h3>
-                <form>
-                  <div class="form-check"><input type="checkbox" class="form-check-input" /><label class="form-check-label">Account Active</label></div>
-                  <div class="form-check"><input type="checkbox" class="form-check-input" /><label class="form-check-label">Account Unlocked</label></div>
-                  <button type="submit" class="btn btn-primary mt-4">Update</button>
+                <h3 class="mb-4">Account Settings</h3>
+                <form #settingsForm="ngForm" (ngSubmit)="updateAccountSettings(settingsForm)">
+                  <div class="form-check">
+                    <input [checked]="state?.appData?.data?.user?.enabled" 
+                    [ngModel]="state?.appData?.data?.user?.enabled"
+                    type="checkbox" class="form-check-input" name="enabled"
+                    [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || roleForm.value.roleName === 'ROLE_USER' || roleForm.value.roleName === 'ROLE_MANAGER' ||(isLoading$ | async)"/>
+                    <label class="form-check-label">Account Active</label>
+                  </div>
+                  <div class="form-check">
+                    <input [checked]="state?.appData?.data?.user?.notLocked" 
+                    [ngModel]="state?.appData?.data?.user?.notLocked"
+                    type="checkbox" class="form-check-input" name="notLocked"
+                    [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || roleForm.value.roleName === 'ROLE_USER' || roleForm.value.roleName === 'ROLE_MANAGER' ||(isLoading$ | async)"/>
+                    <label class="form-check-label">Account Unlocked</label>
+                  </div>
+                  <button type="submit" class="btn btn-primary mt-3" [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') ||(isLoading$ | async)">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
+                    <span *ngIf="isLoading$ | async">Loading...</span>
+                    <span *ngIf="!(isLoading$ | async)">Update</span>
+                </button>
                 </form>
               </div>
   
@@ -200,4 +216,10 @@
       </section>
     </ng-container>
   </ng-container>
+
+  <!-- change profile image form -->
+  <form enctype="multipart/form-data" style="display:none;">
+    <input type="file" #fileInput (change)="updatePicture($event.target.files[0])" name="image" id="image"
+      placeholder="file" ngModel accept="image/*" />
+  </form>
   

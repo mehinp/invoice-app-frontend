@@ -68,7 +68,7 @@ export class UserService {
           catchError(this.handleError))
     );
 
-  updatePassword$ = (form: { currentPassword: string, newPassword: string, confirmNewPassword: string}) =>
+  updatePassword$ = (form: { currentPassword: string, newPassword: string, confirmNewPassword: string }) =>
     <Observable<CustomHttpResponse<Profile>>>(
       this.http
         .patch<CustomHttpResponse<Profile>>(
@@ -78,15 +78,35 @@ export class UserService {
         .pipe(tap(console.log), catchError(this.handleError))
     );
 
-    updateRole$ = (roleName: string) =>
-      <Observable<CustomHttpResponse<Profile>>>(
-        this.http
-          .patch<CustomHttpResponse<Profile>>(
-            `${this.server}/user/update/role/${roleName}`,
-            {}
-          )
-          .pipe(tap(console.log), catchError(this.handleError))
-      );
+  updateRole$ = (roleName: string) =>
+    <Observable<CustomHttpResponse<Profile>>>(
+      this.http
+        .patch<CustomHttpResponse<Profile>>(
+          `${this.server}/user/update/role/${roleName}`,
+          {}
+        )
+        .pipe(tap(console.log), catchError(this.handleError))
+    );
+
+  updateAccountSettings$ = (settings: { enabled: boolean, notLocked: boolean }) =>
+    <Observable<CustomHttpResponse<Profile>>>(
+      this.http
+        .patch<CustomHttpResponse<Profile>>(
+          `${this.server}/user/update/settings`,
+          settings
+        )
+        .pipe(tap(console.log), catchError(this.handleError))
+    );
+
+  updateImage$ = (formData: FormData) =>
+    <Observable<CustomHttpResponse<Profile>>>(
+      this.http
+        .patch<CustomHttpResponse<Profile>>(
+          `${this.server}/user/update/image`,
+          formData
+        )
+        .pipe(tap(console.log), catchError(this.handleError))
+    );
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.log(error);
