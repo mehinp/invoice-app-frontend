@@ -1,7 +1,7 @@
 <ng-container *ngIf="(profileState$ | async) as state">
     <ng-container>
-      <app-navbar></app-navbar>
-      <section>
+      <app-navbar [user]="state?.appData?.data?.user"></app-navbar>
+      <section> 
         <div class="container">
           <nav aria-label="breadcrumb" style="margin-top: 8px;">
             <ol class="breadcrumb">
