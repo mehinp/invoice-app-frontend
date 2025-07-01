@@ -1,7 +1,6 @@
 <ng-container *ngIf="(profileState$ | async) as state">
     <ng-container>
       <app-navbar></app-navbar>
-      <!-- <div> {{ state | json }} </div> -->
       <section>
         <div class="container">
           <nav aria-label="breadcrumb" style="margin-top: 8px;">
@@ -172,7 +171,9 @@
                         <strong>Activity Logs</strong>
                         <p class="text-muted">Show the latest activities on your account</p>
                       </div>
-                      <div class="col-auto"><input type="checkbox" class="form-check-input" /></div>
+                      <div class="col-auto"><input type="checkbox" [disabled]="(isLoading$ | async)"
+                        [checked]="(showLogs$ | async)" class="custom-control-input" id="activityLog"
+                        (change)="toggleLogs()" class="form-check-input" /></div>
                     </div>
                   </div>
                 </div>
@@ -180,7 +181,7 @@
             </div>
           </div>
   
-          <div class="row">
+          <div *ngIf="(showLogs$ | async)"class="row">
             <div class="col-xl-12 mt-4">
               <div class="card" style="border-radius: 8px;">
                 <div class="card-body">
@@ -198,12 +199,26 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Chrome</td>
-                        <td>Example IP</td>
-                        <td>06-25-2025</td>
-                        <td><span class="badge bg-success">LOGIN_ATTEMPT_SUCCESS</span></td>
-                        <td>You logged in successfully</td>
+                      <tr *ngFor="let event of state?.appData?.data?.events">
+                        <td> {{ event.device }} </td>
+                        <td> {{ event.ipAddress }} </td>
+                        <td> {{ event.createdAt | date: 'MMMM d, y, h:mm a'}}</td>
+                        <td>
+                          <span class="badge pill" [ngClass]="[
+                            event.type === EventType.LOGIN_ATTEMPT_SUCCESS ? 'bg-success' : '',
+                            event.type === EventType.LOGIN_ATTEMPT ? 'bg-warning ' : '',
+                            event.type === EventType.PROFILE_UPDATE ? 'bg-primary' : '',
+                            event.type === EventType.LOGIN_ATTEMPT_FAILURE ? 'bg-danger' : '',
+                            event.type === EventType.PROFILE_PICTURE_UPDATE ? 'bg-primary' : '',
+                            event.type === EventType.ROLE_UPDATE ? 'bg-info' : '',
+                            event.type === EventType.ACCOUNT_SETTINGS_UPDATE ? 'bg-warning' : '',
+                            event.type === EventType.PASSWORD_UPDATE ? 'bg-warning' : '',
+                            event.type === EventType.MFA_UPDATE ? 'bg-info' : '',
+                            ]">
+                            {{ event.type }}
+                          </span>
+                        </td>
+                        <td> {{ event.description }} </td>
                         <td><button class="btn btn-sm" style="background-color: #fd5d0d;">Report</button></td>
                       </tr>
                     </tbody>
