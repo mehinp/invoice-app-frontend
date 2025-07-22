@@ -33,8 +33,8 @@ export interface Profile {
 
 }
 
-export interface Page {
-    content: Customer[];
+export interface Page<T> {
+    content: T[];
     totalPages: number;
     totalElements: number;
     numberOfElements: number;
