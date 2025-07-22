@@ -1,12 +1,12 @@
-<ng-container>
-  <ng-container>
-    <app-navbar></app-navbar>
+<ng-container *ngIf="(invoicesState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <app-navbar [user]="state?.appData?.data?.user"></app-navbar>
     <section>
       <div class="container">
         <nav aria-label="breadcrumb" style="margin-top: 8px;">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active">Invoices</li>
+            <li class="breadcrumb-item"> <a [routerLink]="['/']">Home</a> </li>
+            <li class="breadcrumb-item active"> Invoices </li>
           </ol>
         </nav>
 
@@ -16,7 +16,7 @@
           </div>
           <div class="col">
             <h4 class="fw-bold text-end">
-              <i style="cursor: pointer; color: green; font-size: 30px;" class="bi bi-file-earmark-excel"></i>
+              <i style="cursor: pointer;color: green;font-size: 30px;" class="bi bi-file-earmark-excel"></i>
             </h4>
           </div>
 
@@ -33,31 +33,41 @@
                 </tr>
               </thead>
               <tbody class="table-body">
-                <tr class="cell-1">
-                  <td>INV-001</td>
-                  <td>Consulting</td>
-                  <td><span class="badge bg-success">PAID</span></td>
-                  <td>Jul 22, 2025</td>
-                  <td>$1,000.00</td>
-                  <td><button type="button" class="btn btn-info btn-sm">Print</button></td>
+                <tr *ngFor="let invoice of state?.appData?.data?.page.content" class="cell-1">
+                  <td>{{ invoice.invoiceNumber }}</td>
+                  <td>{{ invoice.services }}</td>
+                  <td>
+                    <span class="badge"
+                      [ngClass]="[
+                        invoice.status === 'PAID' ? ' bg-success' : '',
+                        invoice.status === 'PENDING' ? ' bg-primary' : '',
+                        invoice.status === 'CANCELED' ? ' bg-danger' : '',
+                        invoice.status === 'OVERDUE' ? ' bg-warning' : ''
+                      ]">
+                      {{ invoice.status }}
+                    </span>
+                  </td>
+                  <td>{{ invoice.date | date: 'mediumDate' }}</td>
+                  <td>${{ invoice.total }}</td>
+                  <td>
+                    <button [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]" type="button" class="btn btn-info btn-sm">Print</button>
+                  </td>
                 </tr>
-                <!-- Repeat <tr> for each invoice as needed -->
               </tbody>
             </table>
 
-            <nav aria-label="Page navigation example">
+            <nav *ngIf="state?.appData?.data?.page.content.length > 0" aria-label="Page navigation example">
               <ul class="pagination justify-content-end">
-                <li class="page-item pointer disabled">
-                  <a class="page-link">&laquo; Prev</a>
+                <li [ngClass]="0 == (currentPage$ | async) ? ' disabled' : ''" class="page-item pointer">
+                  <a (click)="goToNextOrPreviousPage('backward')" class="page-link">&laquo; Prev</a>
                 </li>
-                <li class="page-item pointer active">
-                  <a class="page-link">1</a>
+                <li *ngFor="let pageNumber of [].constructor(state?.appData?.data?.page.totalPages); let i = index;" class="page-item pointer">
+                  <a (click)="goToPage(i)" [ngClass]="i == (currentPage$ | async) ? ' active' : ''" class="page-link">
+                    {{ i + 1 }}
+                  </a>
                 </li>
-                <li class="page-item pointer">
-                  <a class="page-link">2</a>
-                </li>
-                <li class="page-item pointer">
-                  <a class="page-link">Next &raquo;</a>
+                <li [ngClass]="(state?.appData?.data?.page.totalPages - 1) == (currentPage$ | async) ? ' disabled' : ''" class="page-item pointer">
+                  <a (click)="goToNextOrPreviousPage('forward')" class="page-link">Next &raquo;</a>
                 </li>
               </ul>
             </nav>

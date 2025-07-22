@@ -61,12 +61,20 @@ export class CustomerService {
             .pipe(tap(console.log), catchError(this.handleError));
 
     invoices$ = (page: number = 0) => <Observable<CustomHttpResponse<Page<Invoice> & User>>>
-    this.http.get<CustomHttpResponse<Page<Invoice> & User>>
-        (`${this.server}/customer/invoice/list?page=${page}`)
-        .pipe(
-            tap(console.log),
-            catchError(this.handleError)
-        );   
+        this.http.get<CustomHttpResponse<Page<Invoice> & User>>
+            (`${this.server}/customer/invoice/list?page=${page}`)
+            .pipe(
+                tap(console.log),
+                catchError(this.handleError)
+            );
+
+    invoice$ = (invoiceId: number) => <Observable<CustomHttpResponse<Customer & Invoice & User>>>
+        this.http.get<CustomHttpResponse<Customer & Invoice & User>>
+            (`${this.server}/customer/invoice/get/${invoiceId}`)
+            .pipe(
+                tap(console.log),
+                catchError(this.handleError)
+            );
 
     private handleError(error: HttpErrorResponse): Observable<never> {
         console.log(error);

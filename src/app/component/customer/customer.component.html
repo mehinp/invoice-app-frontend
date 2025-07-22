@@ -167,13 +167,13 @@
                         <td>
                           <span class="badge"
                           [ngClass]="[
-                          invoice.status === 'ACTIVE' ? ' bg-success': '',
+                          invoice.status === 'PAID' ? ' bg-success': '',
                           invoice.status === 'PENDING' ? ' bg-primary': '',
-                          invoice.status === 'BANNED' ? ' bg-danger': '',
-                          invoice.status === 'INACTIVE' ? ' bg-info': '',
+                          invoice.status === 'OVERDUE' ? ' bg-warning': '',
+                          invoice.status === 'CANCELED' ? ' bg-danger': '',
                           ]"
                           >{{ invoice.status }}</span></td>
-                        <td>{{ invoice.date }} </td>
+                        <td>{{ invoice.date | date: 'mediumDate' }} </td>
                         <td> ${{ invoice.total }}</td>
                         <td>
                           <button [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]" class="btn btn-info btn-sm">Print</button></td>
