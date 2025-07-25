@@ -9,6 +9,7 @@ import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
 import { UserService } from 'src/app/service/user.service';
+import { saveAs } from 'file-saver'
 
 @Component({
   selector: 'app-home',
@@ -24,6 +25,8 @@ export class HomeComponent implements OnInit {
   currentPage$ = this.currentPageSubject.asObservable();
   private showLogsSubject = new BehaviorSubject<boolean>(false);
   showLogs$ = this.showLogsSubject.asObservable();
+  private fileStatusSubject = new BehaviorSubject<{status: string, type: string, percent: number}>(undefined);
+  fileStatus$ = this.showLogsSubject.asObservable();
   public readonly DataState = DataState;
 
   constructor(private router: Router, private userSerivce: UserService, private customerService: CustomerService) { }
@@ -103,12 +106,14 @@ export class HomeComponent implements OnInit {
   private reportProgress(httpEvent: HttpEvent<string[] | Blob>): void {
     switch (httpEvent.type) {
       case HttpEventType.DownloadProgress || HttpEventType.UploadProgress:
+        this.fileStatusSubject.next({status: 'progress', type: 'Downloading...', percent: Math.round(100 * httpEvent.loaded / httpEvent.total) })
         break;
       case HttpEventType.ResponseHeader:
         console.log('Got response headers', httpEvent)
         break;
       case HttpEventType.Response:
-        
+        saveAs(new File([<Blob>httpEvent.body], httpEvent.headers.get('File-Name'), {type: `${httpEvent.headers.get('Content-Type')};charset-utf-8`}))
+        this.fileStatusSubject.next(undefined)
         break
       default: 
         console.log(httpEvent);
