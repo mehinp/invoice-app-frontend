@@ -24,10 +24,10 @@ export class InvoiceComponent implements OnInit {
   public readonly DataState = DataState;
 
 
-  constructor(private acitvatedRoute: ActivatedRoute, private customerService: CustomerService) { }
+  constructor(private activatedRoute: ActivatedRoute, private customerService: CustomerService) { }
 
   ngOnInit(): void {
-    this.invoiceState$ = this.acitvatedRoute.paramMap.pipe(
+    this.invoiceState$ = this.activatedRoute.paramMap.pipe(
       switchMap((params: ParamMap) => {
         return this.customerService.invoice$(+params.get(INVOICE_ID))
           .pipe(
