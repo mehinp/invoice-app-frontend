@@ -1,22 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Observable, BehaviorSubject, switchMap, map, startWith, catchError, of } from 'rxjs';
+import { jsPDF as pdf } from 'jspdf';
+import { BehaviorSubject, Observable, catchError, map, of, startWith, switchMap } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
-import { CustomHttpResponse, CustomerState } from 'src/app/interface/appstates';
+import { CustomHttpResponse } from 'src/app/interface/appstates';
 import { Customer } from 'src/app/interface/customer';
 import { Invoice } from 'src/app/interface/invoice';
 import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
-import {jsPDF as pdf} from 'jspdf';
  
 const INVOICE_ID: string = 'id';
 @Component({
   selector: 'app-invoice',
-  templateUrl: './invoice.component.html',
-  styleUrls: ['./invoice.component.css']
+  templateUrl: './invoice-detail.component.html',
+  styleUrls: ['./invoice-detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InvoiceComponent implements OnInit {
+export class InvoiceDetailComponent implements OnInit {
   invoiceState$: Observable<State<CustomHttpResponse<Invoice & Customer & User>>>
   private dataSubject = new BehaviorSubject<CustomHttpResponse<Invoice & Customer & User>>(null);
   private isLoadingSubject = new BehaviorSubject<boolean>(false);

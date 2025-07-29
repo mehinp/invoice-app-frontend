@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, map, startWith, catchError, of } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
@@ -12,7 +12,8 @@ import { CustomerService } from 'src/app/service/customer.service';
 @Component({
   selector: 'app-invoices',
   templateUrl: './invoices.component.html',
-  styleUrls: ['./invoices.component.css']
+  styleUrls: ['./invoices.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InvoicesComponent  implements OnInit {
   invoicesState$: Observable<State<CustomHttpResponse<Page<Invoice> & User>>>;
