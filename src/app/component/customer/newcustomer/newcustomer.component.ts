@@ -7,6 +7,7 @@ import { Customer } from 'src/app/interface/customer';
 import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
+import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -22,12 +23,13 @@ export class NewcustomerComponent implements OnInit {
   isLoading$ = this.isLoadingSubject.asObservable();
   public readonly DataState = DataState;
 
-  constructor(private userSerivce: UserService, private customerService: CustomerService) { }
+  constructor(private userSerivce: UserService, private customerService: CustomerService, private notificationSerivce: NotificationService) { }
 
   ngOnInit(): void {
     this.newCustomerState$ = this.customerService.customers$()
       .pipe(
         map(response => {
+          this.notificationSerivce.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           return {
@@ -36,6 +38,7 @@ export class NewcustomerComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADING }),
         catchError((error: string) => {
+          this.notificationSerivce.onError(error);
           return of({
             dataState: DataState.ERROR,
             appData: this.dataSubject.value,
@@ -50,6 +53,7 @@ export class NewcustomerComponent implements OnInit {
     this.newCustomerState$ = this.customerService.newCustomer$(newCustomerForm.value)
       .pipe(
         map(response => {
+          this.notificationSerivce.onDefault(response.message);
           console.log(response)
           newCustomerForm.reset( {type: 'INDIVIDUAL', status: 'ACTIVE'})
           this.isLoadingSubject.next(false);
@@ -59,6 +63,7 @@ export class NewcustomerComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationSerivce.onDefault(error);
           this.isLoadingSubject.next(false);
           return of({
             dataState: DataState.LOADED,

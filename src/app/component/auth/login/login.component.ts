@@ -12,6 +12,7 @@ import {
 import { DataState } from 'src/app/enum/datastate.enum';
 import { Key } from 'src/app/enum/key.enum';
 import { LoginState } from 'src/app/interface/appstates';
+import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -21,12 +22,12 @@ import { UserService } from 'src/app/service/user.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit {
-  loginState$: Observable<LoginState> = of({ dataState: DataState.LOADED});
+  loginState$: Observable<LoginState> = of({ dataState: DataState.LOADED });
   private phoneSubject = new BehaviorSubject<string | null>('null');
   private emailSubject = new BehaviorSubject<string | null>('null');
   public readonly DataState = DataState;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.userService.isAuthenticated() ? this.router.navigate(['/']) : this.router.navigate(['/login']);
@@ -38,6 +39,7 @@ export class LoginComponent implements OnInit {
       .pipe(
         map((response) => {
           if (response.data.user.isUsingMfa) {
+            this.notificationService.onSuccess(response.message);
             this.phoneSubject.next(response.data.user.phone);
             this.emailSubject.next(response.data.user.email);
             return {
@@ -49,6 +51,7 @@ export class LoginComponent implements OnInit {
               ),
             };
           } else {
+            this.notificationService.onSuccess(response.message);
             localStorage.setItem(Key.TOKEN, response.data.access_token);
             localStorage.setItem(
               Key.REFRESH_TOKEN,
@@ -58,16 +61,17 @@ export class LoginComponent implements OnInit {
             return { dataState: DataState.LOADED, loginSuccess: true };
           }
         }),
-    startWith({ dataState: DataState.LOADING, isUsingMfa: false }),
-      catchError((error: string) => {
-        return of({
-          dataState: DataState.ERROR,
-          isUsingMfa: false,
-          loginSuccess: false,
-          error,
-        });
-      })
-    );
+        startWith({ dataState: DataState.LOADING, isUsingMfa: false }),
+        catchError((error: string) => {
+          this.notificationService.onError(error);
+          return of({
+            dataState: DataState.ERROR,
+            isUsingMfa: false,
+            loginSuccess: false,
+            error,
+          });
+        })
+      );
   }
 
 
@@ -75,25 +79,28 @@ export class LoginComponent implements OnInit {
     this.loginState$ = this.userService.verifyCode$(this.emailSubject.value, verifyCodeForm.value.code)
       .pipe(
         map((response) => {
+          this.notificationService.onDefault(response.message);
           localStorage.setItem(Key.TOKEN, response.data.access_token);
           localStorage.setItem(Key.REFRESH_TOKEN, response.data.refresh_token);
           this.router.navigate(['/']);
           return { dataState: DataState.LOADED, loginSuccess: true };
-      }),
-    startWith({ dataState: DataState.LOADING, isUsingMfa: false }),
-      catchError((error: string) => {
-        return of({
-          dataState: DataState.ERROR,
-          isUsingMfa: false,
-          loginSuccess: false,
-          error})
+        }),
+        startWith({ dataState: DataState.LOADING, isUsingMfa: false }),
+        catchError((error: string) => {
+          this.notificationService.onError(error);
+          return of({
+            dataState: DataState.ERROR,
+            isUsingMfa: false,
+            loginSuccess: false,
+            error
+          })
         })
       )
-    }
-    
-  loginPage(): void {
-    this.loginState$ = of({dataState : DataState.LOADED})
   }
 
-} 
+  loginPage(): void {
+    this.loginState$ = of({ dataState: DataState.LOADED })
+  }
+
+}
 

@@ -9,6 +9,7 @@ import { Invoice } from 'src/app/interface/invoice';
 import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
+import { NotificationService } from 'src/app/service/notification.service';
  
 const INVOICE_ID: string = 'id';
 @Component({
@@ -25,7 +26,7 @@ export class InvoiceDetailComponent implements OnInit {
   public readonly DataState = DataState;
 
 
-  constructor(private activatedRoute: ActivatedRoute, private customerService: CustomerService) { }
+  constructor(private activatedRoute: ActivatedRoute, private customerService: CustomerService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.invoiceState$ = this.activatedRoute.paramMap.pipe(
@@ -33,6 +34,7 @@ export class InvoiceDetailComponent implements OnInit {
         return this.customerService.invoice$(+params.get(INVOICE_ID))
           .pipe(
             map(response => {
+              this.notificationService.onDefault(response.message);
               console.log(response)
               this.dataSubject.next(response);
               return {
@@ -41,6 +43,7 @@ export class InvoiceDetailComponent implements OnInit {
             }),
             startWith({ dataState: DataState.LOADING }),
             catchError((error: string) => {
+              this.notificationService.onError(error);
               return of({
                 dataState: DataState.ERROR,
                 error

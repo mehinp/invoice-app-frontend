@@ -8,6 +8,7 @@ import { Customer } from 'src/app/interface/customer';
 import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
+import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -27,12 +28,13 @@ export class CustomersComponent implements OnInit {
   showLogs$ = this.showLogsSubject.asObservable();
   public readonly DataState = DataState;
 
-  constructor(private router: Router, private userSerivce: UserService, private customerService: CustomerService) { }
+  constructor(private router: Router, private userSerivce: UserService, private customerService: CustomerService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.customersState$ = this.customerService.searchCustomers$()
       .pipe(
         map(response => {
+          this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           return {
@@ -41,6 +43,7 @@ export class CustomersComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADING }),
         catchError((error: string) => {
+          this.notificationService.onDefault(error);
           return of({
             dataState: DataState.ERROR,
             appData: this.dataSubject.value,
@@ -55,6 +58,7 @@ export class CustomersComponent implements OnInit {
     this.customersState$ = this.customerService.searchCustomers$(searchForm.value.name)
       .pipe(
         map(response => {
+          this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           return {
@@ -63,6 +67,7 @@ export class CustomersComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationService.onDefault(error);
           return of({
             dataState: DataState.ERROR,
             appData: this.dataSubject.value,
@@ -76,6 +81,7 @@ export class CustomersComponent implements OnInit {
     this.customersState$ = this.customerService.searchCustomers$(name, pageNumber)
       .pipe(
         map(response => {
+         // this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           this.currentPageSubject.next(pageNumber)
@@ -85,6 +91,7 @@ export class CustomersComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationService.onDefault(error);
           return of({
             dataState: DataState.LOADED,
             appData: this.dataSubject.value,

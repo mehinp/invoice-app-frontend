@@ -10,6 +10,7 @@ import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
 import { UserService } from 'src/app/service/user.service';
 import { saveAs } from 'file-saver'
+import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
   selector: 'app-home',
@@ -30,12 +31,13 @@ export class HomeComponent implements OnInit {
   fileStatus$ = this.showLogsSubject.asObservable();
   public readonly DataState = DataState;
 
-  constructor(private router: Router, private userSerivce: UserService, private customerService: CustomerService) { }
+  constructor(private router: Router, private userSerivce: UserService, private customerService: CustomerService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.homeState$ = this.customerService.customers$()
       .pipe(
         map(response => {
+        //  this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           return {
@@ -44,6 +46,7 @@ export class HomeComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADING }),
         catchError((error: string) => {
+          this.notificationService.onDefault(error);
           return of({
             dataState: DataState.ERROR,
             appData: this.dataSubject.value,
@@ -57,6 +60,7 @@ export class HomeComponent implements OnInit {
     this.homeState$ = this.customerService.customers$(pageNumber)
       .pipe(
         map(response => {
+       //   this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           this.currentPageSubject.next(pageNumber)
@@ -66,6 +70,7 @@ export class HomeComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationService.onDefault(error);
           return of({
             dataState: DataState.LOADED,
             appData: this.dataSubject.value,
@@ -87,6 +92,7 @@ export class HomeComponent implements OnInit {
     this.homeState$ = this.customerService.downloadReport$()
       .pipe(
         map(response => {
+          this.notificationService.onDefault('Downloading report...');
           console.log(response)
           this.reportProgress(response);
           return {
@@ -95,6 +101,7 @@ export class HomeComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationService.onError(error);
           return of({
             dataState: DataState.LOADED,
             appData: this.dataSubject.value,

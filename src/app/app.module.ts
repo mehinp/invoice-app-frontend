@@ -10,19 +10,20 @@ import { HomeModule } from './component/home/home.module';
 import { InvoiceModule } from './component/invoice/invoice.module';
 import { UserModule } from './component/profile/user.module';
 import { CoreModule } from './core/core.module';
+import { NotificationModule } from './notification.module';
 
 @NgModule({
   declarations: [ AppComponent ],
   imports: [
     BrowserModule,
-    HttpClientModule,
     CoreModule,
     AuthModule,
     CustomerModule,
     InvoiceModule,
     UserModule,
     HomeModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NotificationModule
   ],
   bootstrap: [AppComponent]
 })

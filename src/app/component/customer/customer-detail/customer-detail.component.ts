@@ -7,6 +7,7 @@ import { CustomHttpResponse, CustomerState, Page } from 'src/app/interface/appst
 import { State } from 'src/app/interface/state';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
+import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -23,7 +24,7 @@ export class CustomerDetailComponent implements OnInit {
   public readonly DataState = DataState;
   private readonly CUSTOMER_ID: string = 'id';
 
-  constructor(private acitvatedRoute: ActivatedRoute, private customerService: CustomerService) { }
+  constructor(private acitvatedRoute: ActivatedRoute, private customerService: CustomerService, private notificationSerivce: NotificationService) { }
 
   ngOnInit(): void {
     this.customerState$ = this.acitvatedRoute.paramMap.pipe(
@@ -31,6 +32,7 @@ export class CustomerDetailComponent implements OnInit {
         return this.customerService.customer$(+params.get(this.CUSTOMER_ID))
           .pipe(
             map(response => {
+              this.notificationSerivce.onDefault(response.message);
               console.log(response)
               this.dataSubject.next(response);
               return {
@@ -39,6 +41,7 @@ export class CustomerDetailComponent implements OnInit {
             }),
             startWith({ dataState: DataState.LOADING }),
             catchError((error: string) => {
+              this.notificationSerivce.onDefault(error);
               return of({
                 dataState: DataState.ERROR,
                 error
@@ -56,6 +59,7 @@ export class CustomerDetailComponent implements OnInit {
     this.customerState$ = this.customerService.update$(customerForm.value)
       .pipe(
         map(response => {
+          this.notificationSerivce.onDefault(response.message);
           console.log(response)
           this.dataSubject.next({...response, data: { ...response.data, customer: { ...response.data.customer, invoices: this.dataSubject.value.data.customer.invoices}}});
           this.isLoadingSubject.next(false);
@@ -65,6 +69,7 @@ export class CustomerDetailComponent implements OnInit {
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
+          this.notificationSerivce.onDefault(error);
           this.isLoadingSubject.next(false);
           return of({
             dataState: DataState.ERROR,

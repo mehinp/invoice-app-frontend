@@ -6,6 +6,7 @@ import { DataState } from 'src/app/enum/datastate.enum';
 import { AccountType, VerifyState } from 'src/app/interface/appstates';
 import { User } from 'src/app/interface/user';
 import { CustomerService } from 'src/app/service/customer.service';
+import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -22,7 +23,7 @@ export class VerifyComponent implements OnInit {
   isLoading$ = this.isLoadingSubject.asObservable();
   public readonly DataState = DataState;
 
-  constructor(private activatedRoute: ActivatedRoute, private userService: UserService) { }
+  constructor(private activatedRoute: ActivatedRoute, private userService: UserService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.verifyState$ = this.activatedRoute.paramMap.pipe(
@@ -32,6 +33,7 @@ export class VerifyComponent implements OnInit {
         return this.userService.verify$(params.get('key'), type)
           .pipe(
             map(response => {
+              this.notificationService.onDefault(response.message);
               console.log(response)
               type === 'password' ? this.userSubject.next(response.data.user) : null;
               return {
@@ -40,6 +42,7 @@ export class VerifyComponent implements OnInit {
             }),
             startWith({ type, title: 'Verifying...', dataState: DataState.LOADING, message: 'Please wait while we verify the information.', verifySucess: false }),
             catchError((error: string) => {
+              this.notificationService.onError(error);
               return of({ title: 'An error occurred.', dataState: DataState.ERROR, message: error, verifySucess: false });
             })
           )
@@ -56,6 +59,7 @@ export class VerifyComponent implements OnInit {
     })
       .pipe(
         map(response => {
+          this.notificationService.onDefault(response.message);
           console.log(response)
           this.isLoadingSubject.next(false);
           return {
@@ -64,6 +68,7 @@ export class VerifyComponent implements OnInit {
         }),
         startWith({ type: 'password' as AccountType, dataState: DataState.LOADED}),
         catchError((error: string) => {
+          this.notificationService.onError(error);
           this.isLoadingSubject.next(false);
           return of({ type: 'password' as AccountType, dataState: DataState.LOADED, error: error});
         })

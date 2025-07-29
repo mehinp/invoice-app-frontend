@@ -10,16 +10,15 @@ import { User } from '../interface/user';
 import { Key } from '../enum/key.enum';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { AccountType } from '../interface/appstates'
+import { NotificationService } from './notification.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class UserService {
 
   private readonly server: string = 'http://localhost:8080';
   private jwtHelper = new JwtHelperService();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private notificationService: NotificationService) { }
 
   login$ = (email: string, password: string) =>
     <Observable<CustomHttpResponse<Profile>>>this.http
@@ -148,6 +147,7 @@ export class UserService {
   logOut() {
     localStorage.removeItem(Key.TOKEN);
     localStorage.removeItem(Key.REFRESH_TOKEN);
+
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
