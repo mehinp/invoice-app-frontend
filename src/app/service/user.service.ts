@@ -11,11 +11,12 @@ import { Key } from '../enum/key.enum';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { AccountType } from '../interface/appstates'
 import { NotificationService } from './notification.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class UserService {
 
-  private readonly server: string = 'http://localhost:8080';
+  private readonly server: string = environment.API_BASE_URL;
   private jwtHelper = new JwtHelperService();
 
   constructor(private http: HttpClient, private notificationService: NotificationService) { }

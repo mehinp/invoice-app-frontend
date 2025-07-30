@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Observable, of, BehaviorSubject, map, startWith, catchError, delay } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, startWith } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
 import { EventType } from 'src/app/enum/event-type.enum';
-import { Key } from 'src/app/enum/key.enum';
 import { CustomHttpResponse, Profile } from 'src/app/interface/appstates';
 import { State } from 'src/app/interface/state';
 import { NotificationService } from 'src/app/service/notification.service';
@@ -84,7 +82,7 @@ export class UserComponent implements OnInit {
       this.profileState$ = this.userService.updatePassword$(passwordForm.value)
         .pipe(
           map(response => {
-            this.notificationService.onDefault(response.message);
+            this.notificationService.onSuccess(response.message);
             console.log(response)
             this.dataSubject.next({ ...response, data: response.data });
             this.isLoadingSubject.next(false);

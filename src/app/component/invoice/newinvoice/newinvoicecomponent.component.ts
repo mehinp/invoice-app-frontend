@@ -29,7 +29,6 @@ export class NewinvoicecomponentComponent  implements OnInit {
     this.newInvoiceState$ = this.customerService.newInvoice$()
       .pipe(
         map(response => {
-          this.notificationService.onDefault(response.message);
           console.log(response)
           this.dataSubject.next(response);
           return {
