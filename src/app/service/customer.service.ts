@@ -1,19 +1,16 @@
 import {
     HttpClient,
     HttpErrorResponse,
-    HttpEvent,
-    HttpHeaders,
+    HttpEvent
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CustomHttpResponse, CustomerState, Page, Profile } from '../interface/appstates';
-import { catchError, Observable, tap, throwError } from 'rxjs';
-import { User } from '../interface/user';
-import { Key } from '../enum/key.enum';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import { Stats } from '../interface/stats';
+import { Observable, catchError, tap, throwError } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { CustomHttpResponse, CustomerState, Page } from '../interface/appstates';
 import { Customer } from '../interface/customer';
 import { Invoice } from '../interface/invoice';
-import { environment } from 'src/environments/environment';
+import { Stats } from '../interface/stats';
+import { User } from '../interface/user';
 
 @Injectable()
 export class CustomerService {

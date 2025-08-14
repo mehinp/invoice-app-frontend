@@ -5,10 +5,9 @@ services:
     image: invoice-app-frontend:v1
     ports:
      - 80:80
-    expose: 
-     - 80
     networks:
      - internalnet
+    restart: unless-stopped
     
 networks:
   internalnet:
